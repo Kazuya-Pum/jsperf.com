@@ -98,7 +98,7 @@ exports.register = function (server, options, next) {
     //   SELECT x.id AS pID, x.slug AS url, x.revision, x.title, x.published, x.updated, COUNT(x.slug) AS revisionCount
     //   FROM pages x
     //   WHERE x.title LIKE '%' . searchTerms . '%' OR x.info LIKE '%' . searchTerms . '%'
-    //   GROUP BY x.slug
+    //   GROUP BY x.id, x.slug, x.revision, x.title, x.published, x.updated
     //   ORDER BY updated DESC
     //   LIMIT 0, 50
     // )
@@ -112,7 +112,7 @@ exports.register = function (server, options, next) {
     var q = '%' + searchTerms + '%';
 
     return db.genericQuery(
-      'SELECT * FROM (SELECT x.id AS pID, x.slug AS url, x.revision, x.title, x.published, x.updated, COUNT(x.slug) AS revisionCount FROM pages x WHERE x.title LIKE ? OR x.info LIKE ? GROUP BY x.slug ORDER BY updated DESC LIMIT 0, 50) y LEFT JOIN (SELECT t.pageID, COUNT(t.pageID) AS testCount FROM tests t GROUP BY t.pageID) z ON z.pageID = y.pID;',
+      'SELECT * FROM (SELECT x.id AS pID, x.slug AS url, x.revision, x.title, x.published, x.updated, COUNT(x.slug) AS revisionCount FROM pages x WHERE x.title LIKE ? OR x.info LIKE ? GROUP BY x.id, x.slug, x.revision, x.title, x.published, x.updated ORDER BY updated DESC LIMIT 0, 50) y LEFT JOIN (SELECT t.pageID, COUNT(t.pageID) AS testCount FROM tests t GROUP BY t.pageID) z ON z.pageID = y.pID;',
       [q, q]
     );
   });
